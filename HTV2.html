@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HawkTV</title>
+
+<style>
+body{
+    margin:0;
+    background:#000;
+    color:#ff2a2a;
+    font-family:Arial, sans-serif;
+}
+
+.page{
+    max-width:950px;
+    margin:0 auto;
+    padding:10px 12px 25px;
+    box-sizing:border-box;
+}
+
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:8px 0;
+    border-bottom:1px solid #330000;
+}
+
+.title{
+    font-size:20px;
+    font-weight:bold;
+}
+
+#search{
+    width:180px;
+    padding:6px;
+    font-size:12px;
+    background:#000;
+    color:#ff2a2a;
+    border:1px solid #aa0000;
+}
+
+.player-container{
+    margin-top:10px;
+    display:flex;
+    justify-content:center;
+}
+
+#playerBox{
+    width:100%;
+    max-width:900px;
+    height:420px;
+    border:2px solid #aa0000;
+    border-radius:6px;
+    overflow:hidden;
+    background:black;
+}
+
+iframe{
+    width:100%;
+    height:100%;
+    border:0;
+}
+
+.grid{
+    margin-top:12px;
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(160px, 1fr));
+    gap:10px;
+}
+
+.card{
+    background:#111;
+    border:1px solid #220000;
+    cursor:pointer;
+    border-radius:5px;
+    overflow:hidden;
+}
+
+.thumb{
+    width:100%;
+    height:90px;
+    object-fit:cover;
+}
+
+.info{
+    padding:6px;
+}
+
+.titleText{
+    font-size:12px;
+    font-weight:bold;
+}
+
+.desc{
+    font-size:10px;
+    color:#cc6666;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="page">
+
+<div class="header">
+    <div class="title">HawkTV</div>
+    <input id="search" placeholder="search...">
+</div>
+
+<div class="player-container">
+    <div id="playerBox"></div>
+</div>
+
+<div class="grid" id="grid"></div>
+
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+const videos = [
+{
+    title: "Simpsons Clip",
+    desc: "Funny moments",
+    id: "lm5WwjCAsk4"
+},
+{
+    title: "Simpsons Song",
+    desc: "Classic clip",
+    id: "IAJHDiO8Fr0"
+}
+];
+
+const playerBox = document.getElementById("playerBox");
+const grid = document.getElementById("grid");
+const search = document.getElementById("search");
+
+function youtubeEmbed(id){
+    return `https://www.youtube.com/embed/${id}`;
+}
+
+function youtubeThumb(id){
+    return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
+}
+
+function play(video){
+    playerBox.innerHTML = `
+        <iframe
+            src="${youtubeEmbed(video.id)}"
+            allowfullscreen
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        ></iframe>
+    `;
+}
+
+function render(list){
+    grid.innerHTML = "";
+
+    list.forEach(video => {
+        const card = document.createElement("div");
+        card.className = "card";
+
+        card.innerHTML = `
+            <img class="thumb" src="${youtubeThumb(video.id)}">
+            <div class="info">
+                <div class="titleText">${video.title}</div>
+                <div class="desc">${video.desc}</div>
+            </div>
+        `;
+
+        card.onclick = () => play(video);
+        grid.appendChild(card);
+    });
+}
+
+search.addEventListener("input", e => {
+    const q = e.target.value.toLowerCase();
+    render(videos.filter(v =>
+        v.title.toLowerCase().includes(q) ||
+        v.desc.toLowerCase().includes(q)
+    ));
+});
+
+// INIT
+render(videos);
+play(videos[0]);
+
+});
+</script>
+
+</body>
+</html>
