@@ -14,17 +14,17 @@ body{
 }
 
 .page{
-    max-width:950px;
+    max-width:1000px;
     margin:0 auto;
     padding:10px 12px 25px;
-    box-sizing:border-box;
 }
 
+/* HEADER */
 .header{
     display:flex;
     justify-content:space-between;
     align-items:center;
-    padding:8px 0;
+    padding:10px 0;
     border-bottom:1px solid #330000;
 }
 
@@ -33,25 +33,20 @@ body{
     font-weight:bold;
 }
 
+/* SEARCH */
 #search{
-    width:180px;
+    width:200px;
     padding:6px;
-    font-size:12px;
     background:#000;
     color:#ff2a2a;
     border:1px solid #aa0000;
 }
 
-.player-container{
-    margin-top:10px;
-    display:flex;
-    justify-content:center;
-}
-
+/* PLAYER */
 #playerBox{
     width:100%;
-    max-width:900px;
     height:420px;
+    margin-top:12px;
     border:2px solid #aa0000;
     border-radius:6px;
     overflow:hidden;
@@ -64,41 +59,69 @@ iframe{
     border:0;
 }
 
-.grid{
+/* CATEGORY BAR */
+.categories{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
     margin-top:12px;
+}
+
+.cat{
+    padding:6px 10px;
+    border:1px solid #aa0000;
+    cursor:pointer;
+    font-size:12px;
+    background:#111;
+    transition:0.2s;
+}
+
+.cat:hover{
+    background:#220000;
+}
+
+/* GRID (BIGGER CARDS) */
+.grid{
+    margin-top:15px;
     display:grid;
-    grid-template-columns:repeat(auto-fill, minmax(160px, 1fr));
-    gap:10px;
+    grid-template-columns:repeat(auto-fill, minmax(200px, 1fr));
+    gap:12px;
 }
 
 .card{
     background:#111;
     border:1px solid #220000;
-    cursor:pointer;
-    border-radius:5px;
+    border-radius:6px;
     overflow:hidden;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+.card:hover{
+    transform:scale(1.05);
+    border-color:#ff2a2a;
 }
 
 .thumb{
     width:100%;
-    height:90px;
+    height:120px; /* BIGGER ICON */
     object-fit:cover;
 }
 
 .info{
-    padding:6px;
+    padding:8px;
 }
 
 .titleText{
-    font-size:12px;
+    font-size:13px;
     font-weight:bold;
 }
 
 .desc{
-    font-size:10px;
+    font-size:11px;
     color:#cc6666;
+    margin-top:2px;
 }
-
 </style>
 </head>
 
@@ -111,10 +134,23 @@ iframe{
     <input id="search" placeholder="search...">
 </div>
 
-<div class="player-container">
-    <div id="playerBox"></div>
+<!-- PLAYER -->
+<div id="playerBox">Select a video</div>
+
+<!-- CATEGORIES -->
+<div class="categories">
+    <div class="cat" data-cat="all">All</div>
+    <div class="cat" data-cat="Documentary">Documentary</div>
+    <div class="cat" data-cat="Educational">Educational</div>
+    <div class="cat" data-cat="Movies & Films">Movies & Films</div>
+    <div class="cat" data-cat="Gaming">Gaming</div>
+    <div class="cat" data-cat="Challenge">Challenge</div>
+    <div class="cat" data-cat="Minecraft">Minecraft</div>
+    <div class="cat" data-cat="News">News</div>
+    <div class="cat" data-cat="Cartoon">Cartoon</div>
 </div>
 
+<!-- GRID -->
 <div class="grid" id="grid"></div>
 
 </div>
@@ -124,14 +160,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
 const videos = [
 {
-    title: "Simpsons Clip",
-    desc: "Funny moments",
-    id: "lm5WwjCAsk4"
+    title:"Nature Documentary",
+    desc:"Wildlife scenes",
+    id:"lm5WwjCAsk4",
+    cat:"Documentary"
 },
 {
-    title: "Simpsons Song",
-    desc: "Classic clip",
-    id: "IAJHDiO8Fr0"
+    title:"Math Basics",
+    desc:"Educational video",
+    id:"IAJHDiO8Fr0",
+    cat:"Educational"
+},
+{
+    title:"Minecraft Build",
+    desc:"Epic house build",
+    id:"lm5WwjCAsk4",
+    cat:"Minecraft"
+},
+{
+    title:"Funny Cartoon Clip",
+    desc:"Classic animation",
+    id:"IAJHDiO8Fr0",
+    cat:"Cartoon"
 }
 ];
 
@@ -139,50 +189,76 @@ const playerBox = document.getElementById("playerBox");
 const grid = document.getElementById("grid");
 const search = document.getElementById("search");
 
-function youtubeEmbed(id){
+let currentCategory = "all";
+
+function ytEmbed(id){
     return `https://www.youtube.com/embed/${id}`;
 }
 
-function youtubeThumb(id){
+function ytThumb(id){
     return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
 }
 
-function play(video){
+// PLAYER
+function play(v){
     playerBox.innerHTML = `
         <iframe
-            src="${youtubeEmbed(video.id)}"
+            src="${ytEmbed(v.id)}"
             allowfullscreen
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         ></iframe>
     `;
 }
 
+// GRID
 function render(list){
     grid.innerHTML = "";
 
-    list.forEach(video => {
+    list.forEach(v => {
+
         const card = document.createElement("div");
         card.className = "card";
 
         card.innerHTML = `
-            <img class="thumb" src="${youtubeThumb(video.id)}">
+            <img class="thumb" src="${ytThumb(v.id)}">
             <div class="info">
-                <div class="titleText">${video.title}</div>
-                <div class="desc">${video.desc}</div>
+                <div class="titleText">${v.title}</div>
+                <div class="desc">${v.desc}</div>
             </div>
         `;
 
-        card.onclick = () => play(video);
+        card.onclick = () => play(v);
         grid.appendChild(card);
     });
 }
 
-search.addEventListener("input", e => {
-    const q = e.target.value.toLowerCase();
-    render(videos.filter(v =>
-        v.title.toLowerCase().includes(q) ||
-        v.desc.toLowerCase().includes(q)
-    ));
+// FILTER SYSTEM
+function applyFilters(){
+    const q = search.value.toLowerCase();
+
+    const filtered = videos.filter(v => {
+        const matchText =
+            v.title.toLowerCase().includes(q) ||
+            v.desc.toLowerCase().includes(q);
+
+        const matchCat =
+            currentCategory === "all" || v.cat === currentCategory;
+
+        return matchText && matchCat;
+    });
+
+    render(filtered);
+}
+
+// SEARCH
+search.addEventListener("input", applyFilters);
+
+// CATEGORY CLICK
+document.querySelectorAll(".cat").forEach(btn => {
+    btn.addEventListener("click", () => {
+        currentCategory = btn.dataset.cat;
+        applyFilters();
+    });
 });
 
 // INIT
