@@ -159,8 +159,7 @@ const search = document.getElementById("search");
 let currentCategory = "all";
 
 /* =========================================================
-   🎬 ADD YOUR DEFAULT / LIBRARY VIDEOS HERE
-   ONLY EDIT THIS SECTION
+   🎬 YOUR VIDEOS (UNCHANGED)
    ========================================================= */
 
 const videos = [
@@ -200,9 +199,6 @@ const videos = [
     id:"wzrs89lYRIE",
     cat:["Cartoon","Mumin(1969)","Movies and Films","Anime"]
 }
-    
-
-    
 ];
 
 /* ========================================================= */
@@ -248,18 +244,23 @@ function render(list){
     });
 }
 
-// FILTER SYSTEM
+/* =========================================================
+   ✅ FIXED CATEGORY FILTER (THIS WAS BROKEN)
+   ========================================================= */
+
 function applyFilters(){
 
     const q = search.value.toLowerCase();
 
     const filtered = videos.filter(v => {
+
         const matchText =
             v.title.toLowerCase().includes(q) ||
             v.desc.toLowerCase().includes(q);
 
         const matchCat =
-            currentCategory === "all" || v.cat === currentCategory;
+            currentCategory === "all" ||
+            (Array.isArray(v.cat) && v.cat.includes(currentCategory));
 
         return matchText && matchCat;
     });
