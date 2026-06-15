@@ -151,6 +151,7 @@ iframe{
     <div class="cat" data-cat="Simpsons">Simpsons</div>
     <div class="cat" data-cat="Music">Music</div>
     <div class="cat" data-cat="SickickMusic">SickickMusic</div>
+    <div class="cat" data-cat="FamilyGuy">FamilyGuy</div>
     
 </div>
 
@@ -256,6 +257,18 @@ const videos = [
     id:"hXfwXzgSgTE",
     cat:["Music"]
 },
+{  
+    title:"The Simpsons - Balenciaga ",
+    desc:"Not an official episode - it's an advertisement in a form of an episode",
+    id:"PZHESOq-Gkw",
+    cat:["Cartoon","Movies and Films","Sitcom","Simpsons"]
+},
+{  
+    title:"Family Guy’s Lost 1998 Pilot (Full Version) [1080p FOUND]",
+    desc:"FamilyGuyS0E1",
+    id:"XF7UuM3N_pM",
+    cat:["Cartoon","Movies and Films","Sitcom","FamilyGuy"]
+},
     
 ];
 
@@ -339,7 +352,7 @@ document.querySelectorAll(".cat").forEach(btn => {
 
 // INIT
 render(videos);
-if(videos.length > 0) play(videos[14]);
+if(videos.length > 0) play(videos[12]);
 
 });
 </script>
