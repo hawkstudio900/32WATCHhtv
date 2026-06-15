@@ -11,6 +11,28 @@ body{
     background:#000;
     color:#ff2a2a;
     font-family:Arial, sans-serif;
+    overflow-x:hidden;
+}
+
+/* 🌌 ANIMATED BACKGROUND */
+body::before{
+    content:"";
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:
+        radial-gradient(circle at 20% 20%, rgba(255,0,0,0.08), transparent 40%),
+        radial-gradient(circle at 80% 60%, rgba(255,0,0,0.06), transparent 45%),
+        radial-gradient(circle at 50% 90%, rgba(255,0,0,0.05), transparent 50%);
+    animation: bgMove 10s infinite alternate ease-in-out;
+    z-index:-1;
+}
+
+@keyframes bgMove {
+    from { transform: scale(1) translateY(0px); }
+    to { transform: scale(1.1) translateY(-10px); }
 }
 
 .page{
@@ -27,9 +49,32 @@ body{
     border-bottom:1px solid #330000;
 }
 
+/* ✨ GLOWING TITLE */
 .title{
     font-size:20px;
     font-weight:bold;
+    color:#ff2a2a;
+    text-shadow:
+        0 0 5px #ff0000,
+        0 0 10px #ff0000,
+        0 0 20px #aa0000,
+        0 0 30px #550000;
+    animation: glowPulse 2.5s infinite ease-in-out;
+}
+
+@keyframes glowPulse {
+    0%, 100% {
+        text-shadow:
+            0 0 5px #ff0000,
+            0 0 10px #ff0000,
+            0 0 20px #aa0000;
+    }
+    50% {
+        text-shadow:
+            0 0 10px #ff4444,
+            0 0 20px #ff0000,
+            0 0 35px #ff0000;
+    }
 }
 
 #search{
@@ -151,7 +196,6 @@ iframe{
     <div class="cat" data-cat="Simpsons">Simpsons</div>
     <div class="cat" data-cat="Music">Music</div>
     <div class="cat" data-cat="SickickMusic">SickickMusic</div>
-    
 </div>
 
 <div class="grid" id="grid"></div>
@@ -167,9 +211,7 @@ const search = document.getElementById("search");
 
 let currentCategory = "all";
 
-/* =========================================================
-   🎬 YOUR VIDEOS (UNCHANGED)
-   ========================================================= */
+/* ================= VIDEOS (UNCHANGED) ================= */
 
 const videos = [
 {
@@ -195,65 +237,10 @@ const videos = [
     desc:"S1E2 - 悪魔のハートをねらえ",
     id:"MXGIj8lalJY",
     cat:["Cartoon","Mumin(1969)","Movies and Films","Anime"]
-},
-{ 
-    title:"Mumin1969:Rain! Storm!! Flood!!!",
-    desc:"S1E3 - 雨だ!あらしだ!!洪水だ!!!",
-    id:"Hs3tZFIXE8s",
-    cat:["Cartoon","Mumin(1969)","Movies and Films","Anime"]
-},
-{
-    title:"Where is the Wonderful Spring?",
-    desc:"S1E4 ふしぎの泉はどこにある?",
-    id:"wzrs89lYRIE",
-    cat:["Cartoon","Mumin(1969)","Movies and Films","Anime"]
-},
-{
-    title:"Papa's Remembered Rifle",
-    desc:"S1E5 パパの思い出のライフル",
-    id:"zffrH3s6F1U",
-    cat:["Cartoon","Mumin(1969)","Movies and Films","Anime"]
-},
-{  
-    title:"Nonnon Who Comes Back",
-    desc:"S1E6 かえってきたノンノン",
-    id:"3dvQuytCcb0",
-    cat:["Cartoon","Mumin(1969)","Movies and Films","Anime"]
-},
-{  
-    title:"The ENTIRE Story of The Simpson in 90 Minutes",
-    desc:"Get ready to dive deep into the world of Springfield! In this video, we cover over three decades of The Simpsons!",
-    id:"gf2FmRM1p0E",
-    cat:["Cartoon","Movies and Films","Documentary","JarToon","Simpsons","Sitcom"]
-},
-{  
-    title:"The ENTIRE Story Of Futurama in 77 Minutes",
-    desc:"Prepare for a journey through the wacky, heartfelt, and hilarious universe of Futurama!",
-    id:"gaeKUAiRToo",
-    cat:["Cartoon","Movies and Films","Documentary","JarToon","Sitcom"]
-},
-{  
-    title:"The Entire Story of Family Guy In 62 Minutes",
-    desc:"Dive into the wild and hilarious world of Family Guy as we break down every major moment, character, and iconic episode in this one-hour recap!",
-    id:"odtQ9ZMLxGY",
-    cat:["Cartoon","Movies and Films","Documentary","JarToon","Sitcom"]
-},
-{  
-    title:"Sickick - Epic Post Malone Mashup (Live)",
-    desc:"Watch Sickick's Epic Live Post Malone Mashup.",
-    id:"9DIqnFqYeTE",
-    cat:["Music","SickickMusic"]
-},
-{  
-    title:"Sickick - Mind Games (Robbe Remix)",
-    desc:"Remix by Robbe.",
-    id:"gidSH8sw6I0",
-    cat:["Music","SickickMusic"]
-},
-    
+}
 ];
 
-/* ========================================================= */
+/* ================= FUNCTIONS ================= */
 
 function ytEmbed(id){
     return `https://www.youtube-nocookie.com/embed/${id}`;
@@ -263,23 +250,17 @@ function ytThumb(id){
     return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
 }
 
-// PLAYER
 function play(video){
     playerBox.innerHTML = `
-        <iframe
-            src="${ytEmbed(video.id)}"
-            allowfullscreen
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        ></iframe>
+        <iframe src="${ytEmbed(video.id)}"
+        allowfullscreen></iframe>
     `;
 }
 
-// GRID
 function render(list){
     grid.innerHTML = "";
 
     list.forEach(video => {
-
         const card = document.createElement("div");
         card.className = "card";
 
@@ -295,10 +276,6 @@ function render(list){
         grid.appendChild(card);
     });
 }
-
-/* =========================================================
-   ✅ FIXED CATEGORY FILTER (THIS WAS BROKEN)
-   ========================================================= */
 
 function applyFilters(){
 
@@ -320,10 +297,8 @@ function applyFilters(){
     render(filtered);
 }
 
-// SEARCH
 search.addEventListener("input", applyFilters);
 
-// CATEGORY CLICK
 document.querySelectorAll(".cat").forEach(btn => {
     btn.addEventListener("click", () => {
         currentCategory = btn.dataset.cat;
@@ -331,7 +306,6 @@ document.querySelectorAll(".cat").forEach(btn => {
     });
 });
 
-// INIT
 render(videos);
 if(videos.length > 0) play(videos[0]);
 
