@@ -57,7 +57,7 @@ iframe{
     border:0;
 }
 
-/* HOME GRID */
+/* HOME CATEGORY GRID */
 .categoryHome{
     display:grid;
     grid-template-columns:repeat(auto-fill, minmax(170px, 1fr));
@@ -68,7 +68,7 @@ iframe{
 /* CATEGORY CARD */
 .catCard{
     position:relative;
-    height:100px;
+    height:110px;
     border:1px solid #aa0000;
     border-radius:8px;
     overflow:hidden;
@@ -181,11 +181,11 @@ const search = document.getElementById("search");
 const categoryHome = document.getElementById("categoryHome");
 const backBtn = document.getElementById("backBtn");
 
-let currentCategory = "all";
+let currentCategory = null;
 
-/* =========================================================
-   🎬 YOUR VIDEOS (UNCHANGED — FULL PRESERVED)
-========================================================= */
+/* =========================
+   YOUR VIDEOS (UNCHANGED)
+========================= */
 
 const videos = [
 {
@@ -268,9 +268,9 @@ const videos = [
 }
 ];
 
-/* =========================================================
-   🌍 CATEGORIES WITH IMAGES (YOU EDIT THESE)
-========================================================= */
+/* =========================
+   CATEGORIES (EDIT IMAGES HERE)
+========================= */
 
 const categories = [
     { name:"Cartoon", img:"https://i.imgur.com/8QfQKQp.jpg" },
@@ -280,59 +280,48 @@ const categories = [
     { name:"FamilyGuy", img:"https://i.imgur.com/2b2b2b2.jpg" }
 ];
 
-/* =========================================================
-   VIDEO ENGINE (YouTube + Internet Archive)
-========================================================= */
+/* =========================
+   PLAYER ENGINE
+========================= */
 
-function getVideoSrc(video){
-
-    // Internet Archive or MP4
-    if(video.type === "archive"){
-        return video.id;
-    }
-
+function getSrc(video){
     return `https://www.youtube-nocookie.com/embed/${video.id}`;
 }
 
 function play(video){
     playerBox.innerHTML = `
-        <iframe src="${getVideoSrc(video)}"
-        allowfullscreen></iframe>
+        <iframe src="${getSrc(video)}" allowfullscreen></iframe>
     `;
 }
 
-function ytThumb(id){
-    return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
-}
-
-/* =========================================================
+/* =========================
    GRID
-========================================================= */
+========================= */
 
 function render(list){
     grid.innerHTML = "";
 
-    list.forEach(video => {
+    list.forEach(v => {
 
         const card = document.createElement("div");
         card.className = "card";
 
         card.innerHTML = `
-            <img class="thumb" src="${ytThumb(video.id)}">
+            <img class="thumb" src="https://img.youtube.com/vi/${v.id}/hqdefault.jpg">
             <div class="info">
-                <div class="titleText">${video.title}</div>
-                <div class="desc">${video.desc}</div>
+                <div class="titleText">${v.title}</div>
+                <div class="desc">${v.desc}</div>
             </div>
         `;
 
-        card.onclick = () => play(video);
+        card.onclick = () => play(v);
         grid.appendChild(card);
     });
 }
 
-/* =========================================================
+/* =========================
    FILTER
-========================================================= */
+========================= */
 
 function applyFilters(){
 
@@ -340,23 +329,22 @@ function applyFilters(){
 
     const filtered = videos.filter(v => {
 
-        const matchText =
+        const text =
             v.title.toLowerCase().includes(q) ||
             v.desc.toLowerCase().includes(q);
 
-        const matchCat =
-            currentCategory === "all" ||
-            v.cat.includes(currentCategory);
+        const cat =
+            !currentCategory || v.cat.includes(currentCategory);
 
-        return matchText && matchCat;
+        return text && cat;
     });
 
     render(filtered);
 }
 
-/* =========================================================
+/* =========================
    HOME SCREEN
-========================================================= */
+========================= */
 
 function renderHome(){
 
@@ -366,17 +354,17 @@ function renderHome(){
 
     categoryHome.innerHTML = "";
 
-    categories.forEach(cat => {
+    categories.forEach(c => {
 
         const div = document.createElement("div");
         div.className = "catCard";
 
         div.innerHTML = `
-            <img src="${cat.img}">
-            <span>${cat.name}</span>
+            <img src="${c.img}">
+            <span>${c.name}</span>
         `;
 
-        div.onclick = () => openCategory(cat.name);
+        div.onclick = () => openCategory(c.name);
 
         categoryHome.appendChild(div);
     });
@@ -393,9 +381,20 @@ function openCategory(name){
     applyFilters();
 }
 
-backBtn.onclick = () => renderHome();
+/* =========================
+   BACK BUTTON
+========================= */
 
-search.addEventListener("input", applyFilters);
+backBtn.onclick = () => {
+    currentCategory = null;
+    search.value = "";
+    renderHome();
+};
+
+/* SEARCH */
+search.addEventListener("input", () => {
+    if(currentCategory) applyFilters();
+});
 
 /* INIT */
 renderHome();
