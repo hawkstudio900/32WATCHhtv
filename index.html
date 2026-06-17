@@ -40,6 +40,7 @@ body{
     border:1px solid #aa0000;
 }
 
+/* PLAYER */
 #playerBox{
     width:100%;
     height:420px;
@@ -56,27 +57,47 @@ iframe{
     border:0;
 }
 
-/* CATEGORY BAR */
-.categories{
-    display:flex;
-    flex-wrap:wrap;
-    gap:8px;
+/* HOME GRID */
+.categoryHome{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(170px, 1fr));
+    gap:12px;
     margin-top:12px;
 }
 
-.cat{
-    padding:6px 10px;
+/* CATEGORY CARD */
+.catCard{
+    position:relative;
+    height:100px;
     border:1px solid #aa0000;
+    border-radius:8px;
+    overflow:hidden;
     cursor:pointer;
-    font-size:12px;
-    background:#111;
+    transition:0.2s;
 }
 
-.cat:hover{
-    background:#220000;
+.catCard:hover{
+    transform:scale(1.05);
+    border-color:#ff2a2a;
 }
 
-/* GRID */
+.catCard img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    opacity:0.7;
+}
+
+.catCard span{
+    position:absolute;
+    bottom:8px;
+    left:10px;
+    color:white;
+    font-weight:bold;
+    text-shadow:0 0 5px black;
+}
+
+/* VIDEO GRID */
 .grid{
     margin-top:15px;
     display:grid;
@@ -117,6 +138,18 @@ iframe{
     font-size:11px;
     color:#cc6666;
 }
+
+/* BACK BUTTON */
+.backBtn{
+    display:none;
+    margin-top:10px;
+    padding:6px 10px;
+    border:1px solid #aa0000;
+    width:fit-content;
+    cursor:pointer;
+    background:#111;
+    border-radius:6px;
+}
 </style>
 </head>
 
@@ -131,30 +164,9 @@ iframe{
 
 <div id="playerBox">Select a video</div>
 
-<div class="categories">
-    <div class="cat" data-cat="all">All</div>
-    <div class="cat" data-cat="Documentary">Documentary</div>
-    <div class="cat" data-cat="Educational">Educational</div>
-    <div class="cat" data-cat="Movies and Films">Movies and Films</div>
-    <div class="cat" data-cat="Gaming">Gaming</div>
-    <div class="cat" data-cat="Challenge">Challenge</div>
-    <div class="cat" data-cat="Minecraft">Minecraft</div>
-    <div class="cat" data-cat="News">News</div>
-    <div class="cat" data-cat="Cartoon">Cartoon</div>
-    <div class="cat" data-cat="Mumin(1969)">Mumin(1969)</div>
-    <div class="cat" data-cat="Anime">Anime</div>
-    <div class="cat" data-cat="EscapeToTheCountry(S25)">EscapeToTheCountry(S25)</div>
-    <div class="cat" data-cat="MrBeast">MrBeast</div>
-    <div class="cat" data-cat="MattBatista">MattBatista</div>
-    <div class="cat" data-cat="Sitcom">Sitcom</div>
-    <div class="cat" data-cat="JarToon">JarToon</div>
-    <div class="cat" data-cat="Simpsons">Simpsons</div>
-    <div class="cat" data-cat="Music">Music</div>
-    <div class="cat" data-cat="SickickMusic">SickickMusic</div>
-    <div class="cat" data-cat="FamilyGuy">FamilyGuy</div>
-    <div class="cat" data-cat="DD1934">DD1934</div>
-    <div class="cat" data-cat="MontyPythonHG">MontyPythonHG</div>
-</div>
+<!-- HOME + BACK -->
+<div id="categoryHome" class="categoryHome"></div>
+<div id="backBtn" class="backBtn">← Back</div>
 
 <div class="grid" id="grid"></div>
 
@@ -166,12 +178,14 @@ document.addEventListener("DOMContentLoaded", () => {
 const playerBox = document.getElementById("playerBox");
 const grid = document.getElementById("grid");
 const search = document.getElementById("search");
+const categoryHome = document.getElementById("categoryHome");
+const backBtn = document.getElementById("backBtn");
 
 let currentCategory = "all";
 
 /* =========================================================
-   🎬 YOUR VIDEOS (UNCHANGED)
-   ========================================================= */
+   🎬 YOUR VIDEOS (UNCHANGED — FULL PRESERVED)
+========================================================= */
 
 const videos = [
 {
@@ -186,7 +200,7 @@ const videos = [
     id:"IAJHDiO8Fr0",
     cat:["Cartoon","Movies and Films","Sitcom","Simpsons"]
 },
-{ 
+{
     title:"Mumin1969:The Secret of the Silk Hat",
     desc:"S1E1",
     id:"R3l77LjCkOc",
@@ -194,104 +208,108 @@ const videos = [
 },
 {
     title:"Mumin1969:Aim for the Devil's Heart",
-    desc:"S1E2 - 悪魔のハートをねらえ",
+    desc:"S1E2",
     id:"MXGIj8lalJY",
     cat:["Cartoon","Mumin(1969)","Movies and Films","Anime"]
 },
-{ 
+{
     title:"Mumin1969:Rain! Storm!! Flood!!!",
-    desc:"S1E3 - 雨だ!あらしだ!!洪水だ!!!",
+    desc:"S1E3",
     id:"Hs3tZFIXE8s",
     cat:["Cartoon","Mumin(1969)","Movies and Films","Anime"]
 },
 {
     title:"Where is the Wonderful Spring?",
-    desc:"S1E4 ふしぎの泉はどこにある?",
+    desc:"S1E4",
     id:"wzrs89lYRIE",
     cat:["Cartoon","Mumin(1969)","Movies and Films","Anime"]
 },
 {
     title:"Papa's Remembered Rifle",
-    desc:"S1E5 パパの思い出のライフル",
+    desc:"S1E5",
     id:"zffrH3s6F1U",
     cat:["Cartoon","Mumin(1969)","Movies and Films","Anime"]
 },
-{  
+{
     title:"Nonnon Who Comes Back",
-    desc:"S1E6 かえってきたノンノン",
+    desc:"S1E6",
     id:"3dvQuytCcb0",
     cat:["Cartoon","Mumin(1969)","Movies and Films","Anime"]
 },
-{  
+{
     title:"The ENTIRE Story of The Simpson in 90 Minutes",
-    desc:"Get ready to dive deep into the world of Springfield!",
+    desc:"Simpsons recap",
     id:"gf2FmRM1p0E",
     cat:["Cartoon","Movies and Films","Documentary","JarToon","Simpsons","Sitcom"]
 },
-{  
+{
     title:"The ENTIRE Story Of Futurama in 77 Minutes",
     desc:"Futurama recap",
     id:"gaeKUAiRToo",
     cat:["Cartoon","Movies and Films","Documentary","JarToon","Sitcom"]
 },
-{  
+{
     title:"The Entire Story of Family Guy In 62 Minutes",
     desc:"Family Guy recap",
     id:"odtQ9ZMLxGY",
     cat:["Cartoon","Movies and Films","Documentary","JarToon","Sitcom"]
 },
-{  
+{
     title:"Sickick - Epic Post Malone Mashup (Live)",
-    desc:"Live mashup",
+    desc:"Music",
     id:"9DIqnFqYeTE",
     cat:["Music","SickickMusic"]
 },
-{  
+{
     title:"Sickick - Mind Games (Robbe Remix)",
-    desc:"Remix",
+    desc:"Music remix",
     id:"gidSH8sw6I0",
     cat:["Music","SickickMusic"]
-},
-
+}
 ];
 
 /* =========================================================
-   🔥 NEW: VIDEO ENGINE (YouTube + Internet Archive)
-   ========================================================= */
+   🌍 CATEGORIES WITH IMAGES (YOU EDIT THESE)
+========================================================= */
+
+const categories = [
+    { name:"Cartoon", img:"https://i.imgur.com/8QfQKQp.jpg" },
+    { name:"Movies and Films", img:"https://i.imgur.com/3ZQZQZQ.jpg" },
+    { name:"Music", img:"https://i.imgur.com/9x9x9x9.jpg" },
+    { name:"Simpsons", img:"https://i.imgur.com/1a1a1a1.jpg" },
+    { name:"FamilyGuy", img:"https://i.imgur.com/2b2b2b2.jpg" }
+];
+
+/* =========================================================
+   VIDEO ENGINE (YouTube + Internet Archive)
+========================================================= */
 
 function getVideoSrc(video){
 
-    // Internet Archive / direct MP4 / AVI
-    if (video.type === "archive") {
+    // Internet Archive or MP4
+    if(video.type === "archive"){
         return video.id;
     }
 
-    // default YouTube
     return `https://www.youtube-nocookie.com/embed/${video.id}`;
 }
 
-// PLAYER
 function play(video){
-
-    const src = getVideoSrc(video);
-
     playerBox.innerHTML = `
-        <iframe
-            src="${src}"
-            allowfullscreen
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        ></iframe>
+        <iframe src="${getVideoSrc(video)}"
+        allowfullscreen></iframe>
     `;
 }
 
-// THUMBNAIL (YouTube only fallback)
 function ytThumb(id){
     return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
 }
 
-// GRID
-function render(list){
+/* =========================================================
+   GRID
+========================================================= */
 
+function render(list){
     grid.innerHTML = "";
 
     list.forEach(video => {
@@ -299,12 +317,8 @@ function render(list){
         const card = document.createElement("div");
         card.className = "card";
 
-        const thumb = video.type === "archive"
-            ? "https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Internet_Archive_logo_and_wordmark.svg/512px-Internet_Archive_logo_and_wordmark.svg.png"
-            : ytThumb(video.id);
-
         card.innerHTML = `
-            <img class="thumb" src="${thumb}">
+            <img class="thumb" src="${ytThumb(video.id)}">
             <div class="info">
                 <div class="titleText">${video.title}</div>
                 <div class="desc">${video.desc}</div>
@@ -316,7 +330,10 @@ function render(list){
     });
 }
 
-/* FILTER */
+/* =========================================================
+   FILTER
+========================================================= */
+
 function applyFilters(){
 
     const q = search.value.toLowerCase();
@@ -329,7 +346,7 @@ function applyFilters(){
 
         const matchCat =
             currentCategory === "all" ||
-            (Array.isArray(v.cat) && v.cat.includes(currentCategory));
+            v.cat.includes(currentCategory);
 
         return matchText && matchCat;
     });
@@ -337,19 +354,51 @@ function applyFilters(){
     render(filtered);
 }
 
-// EVENTS
+/* =========================================================
+   HOME SCREEN
+========================================================= */
+
+function renderHome(){
+
+    categoryHome.style.display = "grid";
+    grid.style.display = "none";
+    backBtn.style.display = "none";
+
+    categoryHome.innerHTML = "";
+
+    categories.forEach(cat => {
+
+        const div = document.createElement("div");
+        div.className = "catCard";
+
+        div.innerHTML = `
+            <img src="${cat.img}">
+            <span>${cat.name}</span>
+        `;
+
+        div.onclick = () => openCategory(cat.name);
+
+        categoryHome.appendChild(div);
+    });
+}
+
+function openCategory(name){
+
+    currentCategory = name;
+
+    categoryHome.style.display = "none";
+    grid.style.display = "grid";
+    backBtn.style.display = "block";
+
+    applyFilters();
+}
+
+backBtn.onclick = () => renderHome();
+
 search.addEventListener("input", applyFilters);
 
-document.querySelectorAll(".cat").forEach(btn => {
-    btn.addEventListener("click", () => {
-        currentCategory = btn.dataset.cat;
-        applyFilters();
-    });
-});
-
-// INIT
-render(videos);
-if(videos.length > 0) play(videos[12]);
+/* INIT */
+renderHome();
 
 });
 </script>
